@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cotizador de Envíos</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    /* ── Reset & Variables ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:   #1a3264;
+      --primary-h: #122349;
+      --accent:    #2d9e5f;
+      --accent-h:  #237d4b;
+      --bg:        #dce6f5;
+      --card:      #ffffff;
+      --text:      #1a2a4a;
+      --muted:     #5a6e8a;
+      --border:    #b8cae0;
+      --radius:    14px;
+      --shadow:    0 6px 32px rgba(26,50,100,.18);
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #c9d9f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      color: var(--text);
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    /* ── Banner superior ── */
+    .card-banner {
+      background: linear-gradient(135deg, #1a3264 0%, #1e4278 100%);
+      border-radius: 14px 14px 0 0;
+      margin: -40px -36px 0 -36px;
+      padding: 28px 24px 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .logo-img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 4px solid var(--accent);
+      object-fit: cover;
+      box-shadow: 0 6px 20px rgba(0,0,0,.35);
+      background: #fff;
+    }
+
+    /* ── Header ── */
+    .card-header {
+      text-align: center;
+      padding: 20px 0 8px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid #dce6f5;
+    }
+
+    .card-header h1 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: .4px;
+      text-transform: uppercase;
+    }
+
+    .card-header p {
+      margin-top: 4px;
+      font-size: .88rem;
+      color: var(--muted);
+    }
+
+    /* ── Form ── */
+    .form-group { margin-bottom: 20px; }
+
+    label {
+      display: block;
+      font-size: .875rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      color: var(--text);
+      transition: border-color .2s;
+      outline: none;
+      background: #f8fafc;
+    }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(45,158,95,.15);
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { opacity: 1; }
+
+    .input-hint {
+      font-size: .8rem;
+      color: var(--primary);
+      background: #dce6f5;
+      border-left: 3px solid var(--accent);
+      padding: 8px 10px;
+      border-radius: 0 6px 6px 0;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    /* ── Tarifa info ── */
+    .tarifa-box {
+      background: linear-gradient(135deg, #1a3264, #1e4a7a);
+      border: none;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 24px;
+      font-size: .85rem;
+      color: #d0e8ff;
+    }
+
+    .tarifa-box strong {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: .92rem;
+      color: #ffffff;
+      letter-spacing: .3px;
+    }
+
+    .tarifa-box b { color: #5eeea0; }
+
+    .tarifa-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px; height: 28px;
+      background: rgba(255,255,255,.15);
+      border-radius: 6px;
+      font-size: .95rem;
+      color: #5eeea0;
+      flex-shrink: 0;
+    }
+
+    /* ── Botón ── */
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-h));
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: filter .2s, transform .1s;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      box-shadow: 0 4px 14px rgba(45,158,95,.35);
+    }
+
+    .btn:hover  { filter: brightness(1.1); }
+    .btn:active { transform: scale(.98); }
+
+    /* ── Resultado ── */
+    #resultado {
+      margin-top: 28px;
+      display: none;
+    }
+
+    .result-card {
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 24px;
+      background: linear-gradient(160deg, #edfaf3, #f5fff9);
+      text-align: center;
+    }
+
+    .result-label {
+      font-size: .85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .result-total {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .result-total span { font-size: 1.4rem; font-weight: 600; }
+
+    .result-detail {
+      margin-top: 14px;
+      font-size: .875rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .result-detail .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .result-detail .row:last-child { border-bottom: none; }
+
+    .result-name {
+      margin-top: 6px;
+      font-size: .95rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* ── Botón limpiar ── */
+    .btn-clear {
+      width: 100%;
+      margin-top: 12px;
+      padding: 10px;
+      background: transparent;
+      color: var(--muted);
+      font-size: .875rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .btn-clear:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* ── Pie ── */
+    footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: .78rem;
+      color: #4a6080;
+      width: 100%;
+    }
+
+    /* ── Error ── */
+    .error-msg {
+      color: #dc2626;
+      font-size: .8rem;
+      margin-top: 4px;
+      display: none;
+    }
+
+    /* ── Responsive ── */
+    /* ── Responsive ── */
+
+    /* Móvil pequeño < 400px */
+    @media (max-width: 400px) {
+      .card { padding: 20px 14px; }
+      .card-banner { margin: -20px -14px 0 -14px; padding: 20px 14px 16px; }
+      .logo-img { width: 88px; height: 88px; }
+      .card-header h1 { font-size: 1.15rem; }
+      .result-total { font-size: 1.8rem; }
+      .btn { font-size: .92rem; padding: 12px; }
+    }
+
+    /* Móvil estándar 401–480px */
+    @media (min-width: 401px) and (max-width: 480px) {
+      .card { padding: 28px 20px; }
+      .card-banner { margin: -28px -20px 0 -20px; }
+      .logo-img { width: 100px; height: 100px; }
+      .result-total { font-size: 2rem; }
+    }
+
+    /* Tablet 481–768px */
+    @media (min-width: 481px) and (max-width: 768px) {
+      .card { max-width: 420px; padding: 36px 30px; }
+    }
+
+    /* Escritorio >= 769px */
+    @media (min-width: 769px) {
+      .card { max-width: 480px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- Banner con logo -->
+  <div class="card-banner">
+    <img src="logo.png" class="logo-img" alt="Envíos Tapachula a Guatemala" />
+  </div>
+
+  <!-- Encabezado -->
+  <div class="card-header">
+    <h1>Cotizador de Envíos</h1>
+    <p>Tapachula, México &nbsp;→&nbsp; Guatemala</p>
+  </div>
+
+  <!-- Tarifa vigente -->
+  <div class="tarifa-box">
+    <strong>
+      <span class="tarifa-icon"><i class="fa-solid fa-box"></i></span>
+      Tarifa vigente
+    </strong>
+    Primeros 5 kg — <b>Q 25.00</b><br>
+    Kilo adicional (después de 5 kg) — <b>Q 2.00 / kg</b>
+  </div>
+
+  <!-- Formulario -->
+  <form id="cotizadorForm" novalidate>
+
+    <div class="form-group">
+      <label for="peso">Peso del paquete (kg) <span style="color:#dc2626">*</span></label>
+      <input type="number" id="peso" min="0.5" step="0.5" placeholder="Ej. 5.5" />
+      <p class="input-hint">
+        <i class="fa-solid fa-circle-info" style="margin-right:5px;color:var(--accent)"></i>
+        <strong>El peso debe ser en medios kilos:</strong><br>
+        Usa incrementos de <strong>0.5 kg</strong> &mdash; por ejemplo: 5.0 &middot; 5.5 &middot; 6.0 &middot; 6.5 &middot; 7.0&hellip;<br>
+        <span style="font-style:italic">No se permiten valores como 5.3 o 6.7.</span>
+      </p>
+      <p class="error-msg" id="pesoError">
+        <i class="fa-solid fa-triangle-exclamation" style="margin-right:4px"></i>
+        Ingresa el peso en medios kilos (ej. 5.0, 5.5, 6.0).
+      </p>
+    </div>
+
+    <button type="submit" class="btn"><i class="fa-solid fa-calculator" style="margin-right:8px"></i>Calcular costo de envío</button>
+  </form>
+
+  <!-- Resultado -->
+  <div id="resultado">
+    <div class="result-card">
+      <div class="result-label">Costo estimado de envío</div>
+      <div class="result-total"><span>Q </span><span id="totalCosto">0.00</span></div>
+      <div class="result-detail" id="desglose"></div>
+    </div>
+    <button class="btn-clear" id="btnLimpiar"><i class="fa-solid fa-rotate-left" style="margin-right:6px"></i>Nueva cotización</button>
+  </div>
+
+</div>
+
+<footer>
+  © <span id="anio"></span> &nbsp;|&nbsp; Envíos Tapachula a Guate &nbsp;·&nbsp; Todos los derechos reservados
+</footer>
+
+<script>
+  // ── Bloquear letras en el campo peso ──
+  document.getElementById('peso').addEventListener('keydown', function (e) {
+    const permitidas = ['Backspace','Delete','Tab','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End','.'];
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      document.getElementById('cotizadorForm').dispatchEvent(new Event('submit'));
+      return;
+    }
+    if (permitidas.includes(e.key)) return;
+    if (e.key >= '0' && e.key <= '9') return;
+    e.preventDefault();
+  });
+
+  // ── Año dinámico en el pie ──
+  document.getElementById('anio').textContent = new Date().getFullYear();
+
+  // ── Lógica de cálculo ──
+  function calcularCosto(kg) {
+    const TARIFA_BASE   = 25;   // Q para los primeros 5 kg
+    const KG_BASE       = 5;
+    const TARIFA_EXTRA  = 2;    // Q por kg adicional
+
+    if (kg <= KG_BASE) {
+      return { total: TARIFA_BASE, extra: 0, kilosExtra: 0 };
+    }
+
+    const kilosExtra = kg - KG_BASE;
+    const costoExtra = kilosExtra * TARIFA_EXTRA;
+    return { total: TARIFA_BASE + costoExtra, extra: costoExtra, kilosExtra };
+  }
+
+  // ── Evento submit ──
+  document.getElementById('cotizadorForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const pesoInput   = document.getElementById('peso');
+    const pesoError   = document.getElementById('pesoError');
+    const resultado   = document.getElementById('resultado');
+    const peso        = parseFloat(pesoInput.value);
+
+    // Validación
+    const esMultiploDeMedio = (Math.round(peso * 2) / 2) === peso;
+
+    if (!pesoInput.value || isNaN(peso) || peso <= 0) {
+      pesoError.textContent = '';
+      pesoError.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="margin-right:4px"></i>Ingresa un número válido mayor a 0.';
+      pesoError.style.display = 'block';
+      pesoInput.focus();
+      resultado.style.display = 'none';
+      return;
+    }
+
+    if (!esMultiploDeMedio) {
+      pesoError.textContent = '';
+      pesoError.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="margin-right:4px"></i>Ingresa el peso en medios kilos (ej. 5.0, 5.5, 6.0).';
+      pesoError.style.display = 'block';
+      pesoInput.focus();
+      resultado.style.display = 'none';
+      return;
+    }
+
+    pesoError.style.display = 'none';
+
+    const { total, extra, kilosExtra } = calcularCosto(peso);
+
+    // Total
+    document.getElementById('totalCosto').textContent = total.toFixed(2);
+
+    // Desglose
+    let desgloseHTML = `
+      <div class="row"><span>Peso ingresado</span><span>${peso.toFixed(2)} kg</span></div>
+      <div class="row"><span>Tarifa base (hasta 5 kg)</span><span>Q 25.00</span></div>`;
+
+    if (kilosExtra > 0) {
+      desgloseHTML += `
+      <div class="row"><span>Kilos adicionales</span><span>${kilosExtra.toFixed(2)} kg</span></div>
+      <div class="row"><span>Cargo adicional (Q2.00 × ${kilosExtra.toFixed(2)})</span><span>Q ${extra.toFixed(2)}</span></div>`;
+    }
+
+    desgloseHTML += `
+      <div class="row" style="font-weight:700;color:#1e293b"><span>Total a cobrar</span><span>Q ${total.toFixed(2)}</span></div>`;
+
+    document.getElementById('desglose').innerHTML = desgloseHTML;
+
+    // Mostrar resultado con animación suave
+    resultado.style.display = 'block';
+    resultado.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+
+  // ── Limpiar ──
+  document.getElementById('btnLimpiar').addEventListener('click', function () {
+    document.getElementById('cotizadorForm').reset();
+    document.getElementById('resultado').style.display = 'none';
+    document.getElementById('pesoError').style.display = 'none';
+    document.getElementById('peso').focus();
+  });
+</script>
+
+</body>
+</html>
